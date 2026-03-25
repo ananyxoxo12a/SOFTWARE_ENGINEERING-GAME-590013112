@@ -1,2 +1,104 @@
-[InternetShortcut]
-URL=https://github.com/Vedansh456/SOFTWARE-ENGINEERING-GAME/blob/main/docs/waterfall.md
+PLEASE NOTE :- CLICK ON EDIT TO SEE THE DIAGRAMS OR DOWNLOAD THIS FILE TO SEE DIAGRAMS
+
+WATERFALL SDLC — BUBBLE SUBMARINE
+
+PHASE 1: REQUIREMENTS ANALYSIS • Gather functional requirements • Define non-functional requirements • Document scope, constraints Output: docs/requirements.md
+
+PHASE 2: SYSTEM DESIGN • Architecture decisions
+• Data structures
+• Game loop design
+• State machine
+Output: docs/design.md
+
+PHASE 3: IMPLEMENTATION
+• HTML5 Canvas game engine
+• 5 enemy types
+• 3 weapon systems
+• Wave & scoring logic
+Output: src/index.html
+
+PHASE 4: TESTING & INTEGRATION
+• 25 unit test cases
+• 91% code coverage
+• Requirements traceability
+Output: tests/game.test.js
+tests/coverage-report.html
+
+PHASE 5: MAINTENANCE
+• Bug tracking
+• Future enhancements planned
+• Performance benchmarks
+Output: docs/maintenance.md
+
+NOTE ON WATERFALL: Each phase must be completed and reviewed before the next begins. Requirements are frozen after Phase 1. Design is frozen after Phase 2. This prevents scope creep and ensures traceability from requirement to test case.
+
+WATERFALL SDLC — BUBBLE SUBMARINE
+
+PHASE 1:- REQUIREMENTS
+
+Introduction
+BUBBLE SUBMARINE is a browser-based 2D game where the player controls a submarine protected by a bubble and survives against waves of enemies. It runs as a single HTML file with no installation.
+
+System Overview Platform: Web browser Input: Keyboard (WASD) + Mouse Type: Single-player survival game No external libraries or servers required
+
+Functional Requirements 🎮 Player Move using WASD keys Smooth movement with speed limit Bubble stays within screen ❤️ Health System Health bar + numeric display Color indication: Green (>50%) Orange (25–50%) Red (<25%) Auto regeneration over time 👾 Enemies 5 types: Jellyfish, Anglerfish, Crab, Manta Ray, Squid Move toward player Deal damage on contact Have individual HP and behavior 🔫 Weapons Pulse Cannon: Infinite ammo, fast Torpedo: Limited ammo, piercing Nova Burst: Area damage 🔁 Game Mechanics Ammo regenerates over time Score increases when enemies die Waves increase difficulty Game ends when health = 0
+
+Non-Functional Requirements Performance: 60 FPS gameplay Usability: Easy to learn (<1 min) Portability: Works on all modern browsers Reliability: No crashes or errors Maintainability: Clean, modular code Deployment: Runs as a single HTML file
+
+Assumptions Browser supports HTML5 Canvas ES6 JavaScript supported User has keyboard + mouse Minimum resolution: 800×600
+
+PHASE 2:- DESIGN
+
+Architecture Overview Deep Bubble uses a single-file monolithic architecture consisting of:
+One HTML file (src/index.html) Embedded CSS for UI rendering Embedded vanilla JavaScript for all game logic
+
+The architecture is intentionally simple to meet NFR-06 (single-file deployability). There is no build pipeline, module bundler, or server-side component. 1.1 High-Level Architecture ┌─────────────────────────────────────────────────────┐ │ Browser Environment │ │ ┌──────────────────────────────────────────────┐ │ │ │ Game Loop (RAF) │ │ │ │ ┌──────────┐ ┌──────────┐ │ │ │ │ │ update()│───▶│ draw() │ │ │ │ │ └──────────┘ └──────────┘ │ │ │ │ │ │ │ │ │ │ ┌────▼────┐ ┌─────▼──────┐ │ │ │ │ │ State │ │ Canvas 2D │ │ │ │ │ │ Manager │ │ Renderer │ │ │ │ │ └────┬────┘ └────────────┘ │ │ │ │ │ │ │ │ │ ┌─────▼──────────────────────────────┐ │ │ │ │ │ Entity Systems │ │ │ │ │ │ Player │ Enemies │ Projectiles │ │ │ │ │ │ Particles │ Shockwaves │ Waves │ │ │ │ │ └────────────────────────────────────┘ │ │ │ └──────────────────────────────────────────────┘ │ │ ┌──────────────────────────────────────────────┐ │ │ │ Input Handler │ │ │ │ Keyboard Events │ Mouse Events │ Touch │ │ │ └──────────────────────────────────────────────┘ │ │ ┌──────────────────────────────────────────────┐ │ │ │ DOM HUD Layer │ │ │ │ Health Bar │ Score │ Wave │ Weapon Slots │ │ │ └──────────────────────────────────────────────┘ │ └─────────────────────────────────────────────────────┘
+
+Data Structures 2.1 Player Object javascriptplayer = { x: Number, // Centre X position y: Number, // Centre Y position r: 52, // Bubble radius (pixels) health: Number, // Current HP maxHealth: Number, // Maximum HP (grows over time) vx: Number, // X velocity vy: Number, // Y velocity speed: 3.5, // Max speed cap shootCooldown: Number, // Frames until next shot invincible: Number // Invincibility frames remaining } 2.2 Enemy Object javascript{ id: String, // Type identifier ('jellyfish','anglerfish',...) label: String, // Display name x: Number, // Centre X y: Number, // Centre Y r: Number, // Collision radius hp: Number, // Current HP maxHp: Number, // Maximum HP (scaled by wave) spd: Number, // Movement speed dmg: Number, // Damage per attack color: String, // Hex colour string angle: Number, // Facing angle (radians) pulseT: Number, // Animation time accumulator attackCooldown: Number, // Frames until next attack tentacles: Array|null // Squid-only tentacle data } 2.3 Projectile Object javascript{ x: Number, y: Number, // Current position vx: Number, vy: Number, // Velocity vector r: Number, // Radius dmg: Number, // Damage on hit color: String, // Visual colour pierce: Boolean, // Passes through enemies life: Number, // Frames remaining trail: Array // Last 10 positions for trail } 2.4 Weapon Definition (WEAPONS constant) javascriptWEAPONS = { 1: { name, cooldown: 12, dmg: 18, spd: 10, r: 4, color, pierce: false, aoe: false }, 2: { name, cooldown: 30, dmg: 55, spd: 14, r: 6, color, pierce: true, aoe: false }, 3: { name, cooldown: 60, dmg: 90, spd: 0, r: 0, color, pierce: false, aoe: true } } 2.5 Enemy Type Template (ENEMY_TYPES array) javascriptENEMY_TYPES = [ { id, label, r, hp, spd, dmg, color, pulse } // × 5 entries ]
+
+Game Loop Design The main loop runs via requestAnimationFrame at ~60 FPS. requestAnimationFrame(loop) └── loop() ├── update() │ ├── Process input (WASD → velocity) │ ├── Clamp player within bounds │ ├── Handle shoot cooldown │ ├── Regenerate ammo │ ├── Regenerate health │ ├── Move & update projectiles │ │ └── Check projectile-enemy collisions │ ├── Move & update enemies │ │ └── Check enemy-player contact → deal damage │ ├── Update shockwaves, particles │ ├── Scroll background bubbles │ ├── Check wave completion → spawn next wave │ └── Check player death → transition to dead screen └── draw() ├── Clear canvas (ocean gradient) ├── Draw caustic light rays ├── Draw background bubbles ├── Draw shockwaves ├── Draw projectile trails + projectiles ├── Draw enemies (type-specific renderer) ├── Draw particles ├── Draw player (bubble + submarine) └── Draw wave announcement overlay
+
+Collision Detection All collision uses circle-circle intersection: function circlesCollide(ax, ay, ar, bx, by, br): distance = sqrt((bx - ax)² + (by - ay)²) return distance < (ar + br) Applied in two contexts:
+
+Projectile vs Enemy — checked per projectile per frame Enemy vs Player — checked when enemy is within (player.r + enemy.r + 5) threshold
+
+Wave Scaling Design WaveEnemy CountHP MultiplierSpeed Multiplier16×1.0×1.028×1.25×1.1310×1.50×1.2N4 + N×2×(1 + (N-1)×0.25)×(1 + (N-1)×0.1)
+
+Rendering Architecture The game uses two separate rendering layers: LayerTechnologyContentGame CanvasHTML5 Canvas 2DOcean, entities, effectsHUDHTML/CSS DOMHealth bar, score, weapon slots This separation allows HUD updates via standard DOM manipulation (faster, CSS-animatable) without redrawing the canvas.
+
+Input Handling Design Keyboard Events: keydown → keys[event.key] = true 1/2/3 → set activeWeapon keyup → keys[event.key] = false
+
+Mouse Events: mousemove → update mouse.x, mouse.y mousedown → mouse.down = true; shoot() mouseup → mouse.down = false
+
+Touch Events (mobile): touchstart → mouse.x/y = touch.clientX/Y; shoot() touchmove → update mouse.x/y touchend → mouse.down = false
+
+State Machine ┌─────────┐ │ MENU │◀────────────────┐ └────┬────┘ │ │ click "DIVE IN" │ ▼ │ ┌─────────┐ health=0 │ │ PLAYING │──────────────▶ ┌──────┐ └─────────┘ │ DEAD │ └──────┘ │ click "DIVE AGAIN" └──────────────────▶ (reinitialise → PLAYING)
+
+Particle System Design Two particle types share the same structure: javascriptparticle = { x, y, vx, vy, r, color, life }
+
+Hit Particles: Spawned on projectile impact. 6 particles, speed 1–4, life 20–40 frames. Explosion Particles: Spawned on enemy death. 20 particles, speed 1–6, life 30–60 frames.
+
+All particles apply gravity (+0.05 vy/frame) and friction (×0.96 per frame).
+
+PHASE 3:- DEVELOPMENT
+
+(CODE ALREADY GIVEN)
+
+PHASE 4:- TESTING
+
+(GIVEN IN TEST CASES)
+
+PHASE 5:- MAINTENANCE
+
+Maintenance Log — Deep Bubble Project: Deep Bubble — Submarine Defense Game Phase: Phase 5 of Waterfall Model Version: 1.0.0
+
+Change Log VersionDateChangeAuthor1.0.02025Initial releaseTeam
+
+Known Defects IDSeverityDescriptionWorkaroundBUG-01LowScore persists briefly on screen after restartNone needed; cosmeticBUG-02LowEnemies can briefly overlap each other when spawningNo gameplay impactBUG-03LowNova Burst shockwave visual can lag 1 frame behindCosmetic only
+
+Planned Enhancements (v1.1)
+
+Persistent high score via localStorage Audio: background ambient + weapon sounds Boss wave every 5th wave Virtual joystick for mobile
+
+Performance Notes Tested at 60 FPS on:
+Chrome 120 / Intel i5 8th gen / Windows 11 Firefox 121 / M1 MacBook Air / macOS 14 Edge 120 / Intel i7 / Ubuntu 22.04
