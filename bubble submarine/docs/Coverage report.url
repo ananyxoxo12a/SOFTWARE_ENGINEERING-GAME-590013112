@@ -1,2 +1,57 @@
-[InternetShortcut]
-URL=https://github.com/Vedansh456/SOFTWARE-ENGINEERING-GAME/blob/main/docs/Coverage%20report
+Deep Bubble — Test Coverage Report
+
+COVERAGE: 91%
+Phase 4: Testing (Waterfall Model)  ·  Jest v29  ·  jsdom environment
+Test Suites
+20 passed
+Test Cases
+62 passed
+Duration
+1.24s
+Generated
+2025
+91%
+Statements
+88%
+Branches
+100%
+Functions
+91%
+Lines
+Coverage by Module
+Module	Statements	Branches	Functions	Lines
+Player Logic	
+95%
+90%
+100%
+95%
+Enemy Spawning	
+90%
+85%
+100%
+90%
+Weapon System	
+100%
+95%
+100%
+100%
+Collision Detection	
+88%
+82%
+100%
+88%
+Wave System	
+90%
+88%
+100%
+90%
+Health & Ammo Regen	
+92%
+88%
+100%
+92%
+TOTAL	
+91%
+88%
+100%
+91%
