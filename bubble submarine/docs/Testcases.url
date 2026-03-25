@@ -1,2 +1,146 @@
-[InternetShortcut]
-URL=https://github.com/Vedansh456/SOFTWARE-ENGINEERING-GAME/blob/main/docs/Testcases
+Test Suites
+TC-01 | Player Initialisation
+4 passed
+Player spawns at canvas centre
+Player starts with 100 HP
+Player starts with zero velocity
+Player bubble radius is 52
+
+
+TC-02 | Player Movement — WASD Input
+5 passed
+Pressing D accelerates player rightward
+Pressing A accelerates player leftward
+Pressing W accelerates player upward
+Pressing S accelerates player downward
+No keys: velocity decays toward zero (friction)
+
+
+TC-03 | Player Boundary Clamping
+4 passed
+Player cannot move beyond left edge
+Player cannot move beyond right edge
+Player cannot move beyond top edge
+Player cannot move beyond bottom edge
+TC-04 | Speed Cap
+1 passed
+Velocity is capped at player.speed (3.5)
+
+
+TC-05 | Health Display Values
+3 passed
+Health percentage is correct at full health
+Health percentage rounds correctly at 50 HP
+Health percentage is 0 at death
+
+
+TC-06 | Passive Health Regeneration (FR-03)
+4 passed
+Health increases by ~0.03 per frame when below max
+Health does not exceed maxHealth
+Max health grows over time (capped at 200)
+Max health never exceeds 200
+
+
+TC-07 | Ammo Regeneration (FR-12)
+4 passed
+Torpedo ammo regenerates after 180 frames
+Nova Burst ammo regenerates after 300 frames
+Ammo does not exceed maximum (torpedo max = 12)
+Regen timer increments each frame when ammo is not full
+
+
+TC-08 | Collision Detection
+4 passed
+Circles touching exactly report collision
+Distant circles do not collide
+Concentric circles collide
+Collision is symmetric
+
+
+TC-09 | Projectile Creation
+5 passed
+Pulse projectile fires toward mouse cursor
+Pulse projectile has correct stats
+Torpedo projectile is piercing
+Nova Burst returns null (AOE weapon, no projectile)
+Projectile speed matches weapon definition
+
+
+TC-10 | Enemy Types — All 5 Exist (FR-04)
+6 passed
+Jellyfish exists in ENEMY_TYPES
+Anglerfish exists in ENEMY_TYPES
+Crab exists in ENEMY_TYPES
+Manta Ray exists in ENEMY_TYPES
+Giant Squid exists in ENEMY_TYPES
+Exactly 5 enemy types defined
+
+
+TC-11 | Enemy Movement
+2 passed
+Enemy moves toward player
+Enemy angle is updated to face player
+
+
+TC-12 | Enemy Damage to Player (FR-05, FR-06)
+4 passed
+Enemy deals damage when in contact and cooldown expired
+Player invincibility prevents damage
+Attack sets invincibility frames to 40
+Attack resets enemy attack cooldown to 80
+
+
+TC-13 | Enemy Spawning & Scaling (FR-14)
+6 passed
+Wave 1 spawns 6 enemies
+Wave 2 spawns 8 enemies
+Wave 5 spawns 14 enemies
+HP scale is ×1.0 on wave 1
+HP scale is ×1.25 on wave 2
+Speed scale is ×1.1 on wave 2
+
+
+TC-14 | Score System (FR-08)
+3 passed
+Score for jellyfish kill = 15 (30 HP × 0.5)
+Score for squid kill = 100 (200 HP × 0.5)
+Score scales with wave (wave 2 squid has higher HP)
+
+
+TC-15–16 | Weapon System (FR-08)
+6 passed
+Weapon 1 (Pulse) is defined
+Weapon 2 (Torpedo) is defined
+Weapon 3 (Nova Burst) is defined
+Pulse: infinite, fast cooldown, no pierce
+Torpedo: piercing, medium cooldown, high speed
+Nova Burst: AOE, slow cooldown, highest damage
+
+
+TC-17 | Nova Burst AOE Damage
+3 passed
+Nova Burst hits all enemies within blast radius (160)
+Nova Burst does not hit enemies beyond 160 units
+Nova Burst applies correct damage (90)
+
+
+TC-18 | Projectile Lifecycle
+5 passed
+Projectile life decrements each frame
+Projectile is alive within canvas bounds
+Projectile is dead when out of bounds (right)
+Projectile is dead when life reaches 0
+Projectile trail grows up to 10 entries
+
+
+TC-19 | Death Condition
+3 passed
+Player health can reach 0
+State should be "dead" when health ≤ 0
+State should NOT be "dead" at 1 HP
+
+
+TC-20 | Diagonal Movement Normalisation
+1 passed
+Diagonal movement does not exceed single-axis speed
